@@ -782,13 +782,14 @@ async function sendCommand() {
 
     addMessage("ai", data.reply);
 
-  } catch (error) {
-    console.error("NOVA AI Error:", error);
-    addMessage(
-      "ai",
-      "I'm having trouble connecting to my AI brain. Please try again!"
-    );
-  }
+ } catch (error) {
+  console.error("NOVA AI Error:", error);
+
+  addMessage(
+    "ai",
+    "Connection error: " + error.message
+  );
+}
 }
 
 
