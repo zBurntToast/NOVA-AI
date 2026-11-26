@@ -748,18 +748,49 @@ function localAI(command) {
   return "I'm NOVA, your personal assistant! "+(profile.name?"Nice to help you, "+profile.name+". ":"")+"I'm currently running in demo mode. My AI connection will be added in a future update. Tell me what you need and I'll help with the features currently available.";
 }
 
-function sendCommand() {
-  const command=$("command").value.trim();
-  if(!command) return;
+async function sendCommand() {
+  const command = $("command").value.trim();
+  if (!command) return;
 
-  $("command").value="";
-  addMessage("user",command);
+  $("command").value = "";
+  addMessage("user", command);
 
-  setTimeout(()=>{
-    const answer=localAI(command);
-    addMessage("ai",answer);
-  },400);
+  try {
+    const response = await fetch(
+      "https://nova-ai.baine12fy.workers.dev",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          messages: [
+            {
+              role: "user",
+              content: command
+            }
+          ]
+        })
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || "AI connection failed.");
+    }
+
+    addMessage("ai", data.reply);
+
+  } catch (error) {
+    console.error("NOVA AI Error:", error);
+    addMessage(
+      "ai",
+      "I'm having trouble connecting to my AI brain. Please try again!"
+    );
+  }
 }
+
 
 function clearChat() {
   if(!confirm("Clear your conversation history?")) return;
