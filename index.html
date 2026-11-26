@@ -785,7 +785,21 @@ async function sendCommand() {
 
   $("command").value = "";
   addMessage("user", command);
+setTimeout(() => {
+  const chat = document.getElementById("chat");
 
+  if (chat) {
+    chat.scrollIntoView({
+      behavior: "smooth",
+      block: "end"
+    });
+  } else {
+    window.scrollTo({
+      top: document.body.scrollHeight,
+      behavior: "smooth"
+    });
+  }
+}, 100);
   try {
     const response = await fetch(
       "https://nova-ai.baine12fy.workers.dev",
