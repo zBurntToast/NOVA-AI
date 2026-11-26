@@ -910,7 +910,7 @@ async function connectSpotify() {
     code_challenge_method: "S256",
     code_challenge: codeChallenge,
     state: state,
-    scope: "playlist-modify-private playlist-modify-public"
+    scope: "playlist-modify-private playlist-modify-public playlist-read-private user-modify-playback-state user-read-playback-state"
   });
 
   window.location.href =
