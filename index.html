@@ -959,6 +959,75 @@ async function handleSpotifyCallback() {
   }
 }
 
+// ===== NOVA SPOTIFY PLAYLIST FUNCTIONS =====
+
+async function spotifyRequest(endpoint, options = {}) {
+  const token = localStorage.getItem("spotify_access_token");
+  const expiry = Number(localStorage.getItem("spotify_token_expiry") || 0);
+
+  if (!token || Date.now() >= expiry) {
+    throw new Error("Spotify session expired. Please reconnect Spotify.");
+  }
+
+  const response = await fetch(
+    "https://api.spotify.com/v1" + endpoint,
+    {
+      ...options,
+      headers: {
+        Authorization: "Bearer " + token,
+        "Content-Type": "application/json",
+        ...options.headers
+      }
+    }
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.error?.message || "Spotify request failed.");
+  }
+
+  return data;
+}
+
+async function createSpotifyPlaylist(name, searchTerm) {
+  // Create a private playlist
+  const playlist = await spotifyRequest("/me/playlists", {
+    method: "POST",
+    body: JSON.stringify({
+      name: name,
+      description: "Created by NOVA AI",
+      public: false
+    })
+  });
+
+  // Find matching songs
+  const search = await spotifyRequest(
+    "/search?type=track&limit=10&q=" +
+    encodeURIComponent(searchTerm)
+  );
+
+  const tracks = search.tracks.items.map(track => track.uri);
+
+  if (!tracks.length) {
+    return "Playlist created, but I couldn't find matching songs.";
+  }
+
+  // Add songs to the playlist
+  await spotifyRequest(
+    "/playlists/" + playlist.id + "/items",
+    {
+      method: "POST",
+      body: JSON.stringify({ uris: tracks })
+    }
+  );
+
+  return "Created your Spotify playlist: " + name +
+    " and added " + tracks.length + " songs!";
+}
+
+// ===== END PLAYLIST FUNCTIONS =====
+
 // ===== END SPOTIFY CONNECTION =====
 handleSpotifyCallback();
 loadProfile();
