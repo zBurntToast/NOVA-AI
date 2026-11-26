@@ -676,7 +676,25 @@ function addTask() {
   createTask(text);
   $("newTask").value="";
 }
+function clearCompletedTasks() {
+  const completedCount = tasks.filter(task => task.done).length;
 
+  if (completedCount === 0) {
+    alert("You don't have any completed tasks!");
+    return;
+  }
+
+  if (!confirm("Delete all " + completedCount + " completed tasks?")) {
+    return;
+  }
+
+  tasks = tasks.filter(task => !task.done);
+
+  saveData("tasks", tasks);
+  renderTasks();
+
+  alert("Completed tasks cleared!");
+}
 function renderTasks() {
   ["taskList","homeTasks"].forEach(id=>{
     const el=$(id);
