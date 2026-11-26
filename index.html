@@ -457,8 +457,14 @@ textarea {
     <label>NEW TASK</label>
     <input id="newTask" placeholder="What needs to get done?">
   </div>
+  <div style="display:flex; gap:10px; flex-wrap:wrap;">
   <button class="primary" onclick="addTask()">Add task +</button>
-  <div id="taskList"></div>
+  <button class="secondary" onclick="clearCompletedTasks()">
+    Clear Completed
+  </button>
+</div>
+
+<div id="taskList"></div>
 </div>
 
 </section>
