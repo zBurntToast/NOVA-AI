@@ -754,6 +754,7 @@ function localAI(command) {
   return "I'm NOVA, your personal assistant! "+(profile.name?"Nice to help you, "+profile.name+". ":"")+"I'm currently running in demo mode. My AI connection will be added in a future update. Tell me what you need and I'll help with the features currently available.";
 }
 
+
 async function sendCommand() {
   const command = $("command").value.trim();
   if (!command) return;
@@ -788,15 +789,32 @@ async function sendCommand() {
 
     addMessage("ai", data.reply);
 
- } catch (error) {
-  console.error("NOVA AI Error:", error);
+    // Check whether NOVA requested a Spotify action
+    if (data.action?.type === "create_playlist") {
+      if (typeof createSpotifyPlaylist !== "function") {
+        throw new Error("Spotify playlist function is missing.");
+      }
 
-  addMessage(
-    "ai",
-    "Connection error: " + error.message
-  );
+      addMessage("ai", "Connecting to Spotify and creating your playlist...");
+
+      const result = await createSpotifyPlaylist(
+        data.action.name,
+        data.action.search_query
+      );
+
+      addMessage("ai", result);
+    }
+
+  } catch (error) {
+    console.error("NOVA Error:", error);
+
+    addMessage(
+      "ai",
+      "I ran into a problem: " + error.message
+    );
+  }
 }
-}
+
 
 
 function clearChat() {
